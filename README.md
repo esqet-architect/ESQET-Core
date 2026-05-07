@@ -16,3 +16,22 @@ The foundation of the framework—the **Unity Resonance Operator**—is official
 
 ---
 *Developed by the AetherMind Institute*
+
+---
+
+## About the Architect
+
+**Marco Antoñio Rocha Jr.** Founder, AetherMind Institute
+
+Independent researcher and interdisciplinary artist. Former body modification specialist and studio owner. After a decade of nomadic fieldwork, Marco returned to structured inquiry, developing ESQET from first principles using computational geometry and scale symmetry.
+
+His work bridges:
+- φ‑scale topological operators
+- Koopman spectral analysis
+- Unified mass hierarchy models
+
+Current mission: **close all parameters. one at a time.**
+
+---
+
+📍 **Galactic Address:** Laniakea / Virgo / Milky Way / Orion Arm / Sol III / ESQET-Core
