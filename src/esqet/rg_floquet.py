@@ -1,28 +1,28 @@
 """
-ESQET Nonlinear Scale-Measure Engine
-Implements Reparameterized RG Flow: dg/dt_eff = beta(g)
-where dt_eff = dt * (1 + epsilon * cos(omega * t))
+ESQET State-Dependent Manifold Engine
+Reparameterizes the scale measure based on coupling strength.
+Axiom 13: Manifold-backreaction for DSI emergence.
 """
 import numpy as np
 from scipy.integrate import odeint
 
-def esqet_measure_dynamics(y, t, omega, epsilon, b0):
+def esqet_manifold_dynamics(y, t, omega, epsilon, b0):
     """
-    Coupled system for coupling g and perturbation delta_g
-    using a non-uniform scale measure (Scale-Measure Engine).
+    Coupled system where the scale metric depends on the coupling g.
+    This breaks the averaging regime by creating state-dependent resonance.
     """
     g, delta_g = y
     
-    # 1. Scale Metric (Deformation of the ln(mu) interval)
-    # This prevents the averaging out of the Floquet term
-    dt_eff_dt = 1.0 + epsilon * np.cos(omega * t)
+    # 1. State-Dependent Scale Metric
+    # The effective frequency is modulated by the log of the coupling strength.
+    # This ensures that the 'clock' speeds up or slows down as g flows.
+    dt_eff_dt = 1.0 + epsilon * np.cos(omega * t * np.log(g**2 + 1.0))
     
     # 2. Beta Function (1-loop QCD approximation)
-    # Note: b0 < 0 for asymptotic freedom (standard QCD convention)
     beta_g = - (b0 * g**3) / (16 * np.pi**2)
     beta_prime_g = - (3 * b0 * g**2) / (16 * np.pi**2)
     
-    # 3. Reparameterized Dynamics
+    # 3. Non-Markovian Dynamics
     dg_dt = beta_g * dt_eff_dt
     ddelta_g_dt = beta_prime_g * dt_eff_dt * delta_g
     
@@ -30,22 +30,16 @@ def esqet_measure_dynamics(y, t, omega, epsilon, b0):
 
 def compute_floquet_monodromy(omega, epsilon, b0=-1.0, g_start=1.2):
     """
-    Computes the stability spectrum over one period of the scale-metric.
+    Computes the stability spectrum over the resonance period.
     """
-    # Period of the scale modulation
     T = 2 * np.pi / omega
-    t_span = np.linspace(0, T, 2000)
-    
-    # Initial conditions: [initial_coupling, initial_perturbation]
+    t_span = np.linspace(0, T, 5000) # Increased resolution for nonlinearity
     y0 = [g_start, 1.0]
     
-    # Integrate over the period T
-    sol = odeint(esqet_measure_dynamics, y0, t_span, args=(omega, epsilon, b0))
+    sol = odeint(esqet_manifold_dynamics, y0, t_span, args=(omega, epsilon, b0))
     
-    # Monodromy Matrix (for 1D, just the scalar ratio)
+    # Monodromy ratio for stability analysis
     monodromy_ratio = np.abs(sol[-1, 1] / y0[1])
-    
-    # Floquet Exponent
     lambda_exp = (1.0 / T) * np.log(monodromy_ratio)
     
     return {
@@ -56,21 +50,19 @@ def compute_floquet_monodromy(omega, epsilon, b0=-1.0, g_start=1.2):
 
 def run_dsi_verification():
     """
-    Verifies if the stability matches Fibonacci/Golden-Ratio hierarchies.
+    Performs the first non-linear resonance check on the φ-hierarchy.
     """
     phi = (1 + 5**0.5) / 2
-    # Test scales (Fibonacci sequence)
     fibs = [1, 2, 3, 5, 8, 13]
     
     print("="*60)
-    print("ESQET Scale-Measure Engine: DSI Verification")
+    print("ESQET MANIFOLD ENGINE: Nonlinear Resonance Test")
     print("="*60)
     
     for n in fibs:
         omega_n = phi**n
-        # Low epsilon to check for resonance capture
-        res = compute_floquet_monodromy(omega=omega_n, epsilon=0.05)
-        print(f"Scale φ^{n:<2} (ω={omega_n:>8.3f}): λ = {res['max_exponent']:.6f}")
+        res = compute_floquet_monodromy(omega=omega_n, epsilon=0.1)
+        print(f"Node φ^{n:<2} (ω={omega_n:>8.3f}): λ = {res['max_exponent']:.6f}")
 
 if __name__ == "__main__":
     run_dsi_verification()
