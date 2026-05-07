@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "esqet"
+version = "0.1.0"
+description = "ESQET Framework — Unity Resonance Operator with φ^ℤ Scale Symmetry"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Marco Antônio Rocha Jr.", email = "esqet.engine@gmail.com"}
+]
+keywords = ["physics", "golden-ratio", "operator-theory", "koopman", "scale-symmetry"]
+dependencies = [
+    "numpy>=1.24",
+    "matplotlib>=3.7",
+    "scipy>=1.10"
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "black"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/esqet"]
