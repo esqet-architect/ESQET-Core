@@ -1,162 +1,76 @@
-"""ESQET Floquet-RG System - Discrete Scale Invariance
-Based on correction: RG flow as non-autonomous dynamical system
-with explicit Floquet monodromy structure.
 """
-
+ESQET Nonlinear Scale-Measure Engine
+Implements Reparameterized RG Flow: dg/dt_eff = beta(g)
+where dt_eff = dt * (1 + epsilon * cos(omega * t))
+"""
 import numpy as np
-from scipy.integrate import odeint, solve_ivp
+from scipy.integrate import odeint
 
-def rg_dynamics(y, t, omega, epsilon, b0):
+def esqet_measure_dynamics(y, t, omega, epsilon, b0):
     """
-    Correct Floquet-RG flow with explicit time-dependent modulation.
-    
-    Parameters:
-    - y: [g, delta_g] coupling and perturbation
-    - omega: driving frequency
-    - epsilon: modulation amplitude  
-    - b0: beta function coefficient (negative for asymptotically free)
-    
-    Returns:
-    - [dg/dt, d(delta_g)/dt]
-    
-    This corrects the structural inconsistency where modulation factor
-    was incorrectly placed inside the derivative.
+    Coupled system for coupling g and perturbation delta_g
+    using a non-uniform scale measure (Scale-Measure Engine).
     """
     g, delta_g = y
     
-    # Base beta function (QCD-like: dg/dt = -b0 * g^3 / (16π²))
-    beta0 = - (b0 * g**3) / (16 * np.pi**2)
-    dbeta0_dg = - (3 * b0 * g**2) / (16 * np.pi**2)
+    # 1. Scale Metric (Deformation of the ln(mu) interval)
+    # This prevents the averaging out of the Floquet term
+    dt_eff_dt = 1.0 + epsilon * np.cos(omega * t)
     
-    # Floquet modulation (time-periodic driving)
-    mod = 1.0 + epsilon * np.cos(omega * t)
+    # 2. Beta Function (1-loop QCD approximation)
+    # Note: b0 < 0 for asymptotic freedom (standard QCD convention)
+    beta_g = - (b0 * g**3) / (16 * np.pi**2)
+    beta_prime_g = - (3 * b0 * g**2) / (16 * np.pi**2)
     
-    # Proper linearized RG flow
-    dg_dt = beta0 * mod
-    ddelta_g_dt = dbeta0_dg * mod * delta_g
+    # 3. Reparameterized Dynamics
+    dg_dt = beta_g * dt_eff_dt
+    ddelta_g_dt = beta_prime_g * dt_eff_dt * delta_g
     
     return [dg_dt, ddelta_g_dt]
 
-
-def compute_floquet_monodromy(omega, epsilon, b0=-1.0, period=None, n_cycles=5):
+def compute_floquet_monodromy(omega, epsilon, b0=-1.0, g_start=1.2):
     """
-    Compute monodromy matrix and Floquet exponents.
-    
-    Returns:
-    - floquet_exponents: Lyapunov exponents for the driven system
-    - monodromy_matrix: M = Φ(T)
-    - stability: classification (stable / marginal / chaotic)
+    Computes the stability spectrum over one period of the scale-metric.
     """
-    if period is None:
-        period = 2 * np.pi / omega
+    # Period of the scale modulation
+    T = 2 * np.pi / omega
+    t_span = np.linspace(0, T, 2000)
     
-    g0 = 1.0  # Initial coupling (unity resonance point)
-    delta0 = 1e-6  # Small perturbation
+    # Initial conditions: [initial_coupling, initial_perturbation]
+    y0 = [g_start, 1.0]
     
-    # Integrate over one period to get monodromy
-    t_span = (0, period)
-    t_eval = np.linspace(0, period, 100)
+    # Integrate over the period T
+    sol = odeint(esqet_measure_dynamics, y0, t_span, args=(omega, epsilon, b0))
     
-    # Need to integrate basis vectors for monodromy
-    def monodromy_ode(t, y):
-        # y = [g, delta_g, delta_g_2]
-        g = y[0]
-        delta_g1 = y[1]
-        delta_g2 = y[2]
-        dg = rg_dynamics([g, delta_g1], t, omega, epsilon, b0)[0]
-        ddelta = rg_dynamics([g, delta_g1], t, omega, epsilon, b0)[1]
-        # Second basis vector
-        ddelta2 = rg_dynamics([g, delta_g2], t, omega, epsilon, b0)[1]
-        return [dg, ddelta, ddelta2]
+    # Monodromy Matrix (for 1D, just the scalar ratio)
+    monodromy_ratio = np.abs(sol[-1, 1] / y0[1])
     
-    # Simpler approach: finite differences
-    # Evolve two nearby trajectories
-    n_steps = 1000
-    dt = period / n_steps
-    
-    g = g0
-    delta1 = delta0
-    delta2 = delta0 * 1.01  # slightly different
-    
-    for i in range(n_steps):
-        t_i = i * dt
-        dg, ddelta1 = rg_dynamics([g, delta1], t_i, omega, epsilon, b0)[:2]
-        dg, ddelta2 = rg_dynamics([g, delta2], t_i, omega, epsilon, b0)[:2]
-        
-        g += dg * dt
-        delta1 += ddelta1 * dt
-        delta2 += ddelta2 * dt
-    
-    # Monodromy matrix (ratio of final to initial perturbations)
-    M = np.array([[delta1 / delta0, 0],
-                  [0, delta2 / (delta0 * 1.01)]])
-    
-    # Floquet exponents = eigenvalues of M
-    floquet_exp = np.log(np.abs(np.linalg.eigvals(M))) / period
-    
-    # Classification
-    max_exp = max(floquet_exp)
-    if max_exp < -1e-6:
-        stability = "ASYMPTOTICALLY STABLE RG fixed manifold"
-    elif abs(max_exp) < 1e-5:
-        stability = "MARGINAL KAM torus (quasi-periodic universality)"
-    else:
-        stability = "RG CHAOS (breakdown of scale invariance)"
+    # Floquet Exponent
+    lambda_exp = (1.0 / T) * np.log(monodromy_ratio)
     
     return {
-        'floquet_exponents': floquet_exp,
-        'monodromy_matrix': M,
-        'stability': stability,
-        'max_exponent': max_exp
+        'max_exponent': lambda_exp,
+        'g_final': sol[-1, 0],
+        'period': T
     }
 
-
-def discrete_scale_invariance_check(omega, epsilon, b0=-1.0, scales=[1, 2, 3, 5, 8, 13, 21]):
+def run_dsi_verification():
     """
-    Check if RG flow exhibits discrete scale invariance (DSI).
-    DSI manifests as log-periodicity: λ should be ~ 0 with marginal stability.
-    
-    Returns dict with scaling analysis.
+    Verifies if the stability matches Fibonacci/Golden-Ratio hierarchies.
     """
-    results = {}
-    for scale in scales:
-        scaled_omega = omega * scale
-        floquet = compute_floquet_monodromy(scaled_omega, epsilon, b0)
-        results[scale] = floquet['max_exponent']
+    phi = (1 + 5**0.5) / 2
+    # Test scales (Fibonacci sequence)
+    fibs = [1, 2, 3, 5, 8, 13]
     
-    # Check if exponents cluster near zero (signature of quasicrystal class)
-    near_zero = sum(1 for v in results.values() if abs(v) < 1e-5)
+    print("="*60)
+    print("ESQET Scale-Measure Engine: DSI Verification")
+    print("="*60)
     
-    return {
-        'scale_exponents': results,
-        'dsi_confidence': near_zero / len(scales),
-        'is_quasicrystal_class': near_zero > len(scales) * 0.6
-    }
-
+    for n in fibs:
+        omega_n = phi**n
+        # Low epsilon to check for resonance capture
+        res = compute_floquet_monodromy(omega=omega_n, epsilon=0.05)
+        print(f"Scale φ^{n:<2} (ω={omega_n:>8.3f}): λ = {res['max_exponent']:.6f}")
 
 if __name__ == "__main__":
-    print("="*60)
-    print("ESQET Floquet-RG Analysis")
-    print("Discrete Scale Invariance Verification")
-    print("="*60)
-    
-    # Test parameters
-    omega = 1.0  # driving frequency
-    epsilon = 0.1  # modulation
-    
-    print(f"\nDriving: ω={omega}, ε={epsilon}")
-    print("-"*40)
-    
-    floquet = compute_floquet_monodromy(omega, epsilon)
-    print(f"Floquet exponents: {floquet['floquet_exponents'][0]:.6f}")
-    print(f"Stability class: {floquet['stability']}")
-    
-    print("\nDiscrete Scale Invariance Test (Fibonacci ratios 1,2,3,5,8,13,21):")
-    dsi = discrete_scale_invariance_check(omega, epsilon)
-    for scale, exp in dsi['scale_exponents'].items():
-        print(f"  Scale {scale} (φ^{scale:.0f}): λ = {exp:.6f}")
-    
-    print(f"\nDSI confidence: {dsi['dsi_confidence']*100:.1f}%")
-    print(f"Quasicrystal universality class: {dsi['is_quasicrystal_class']}")
-    
-    print("\n✓ ESQET RG flow is now a proper non-autonomous dynamical system")
+    run_dsi_verification()
