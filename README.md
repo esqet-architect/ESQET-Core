@@ -35,3 +35,13 @@ Unity operator projects φ-signals onto L(3,1) lens space:
 | **8** | φ⁵ conservation | Variance 0.4944 | **STABLE** |
 
 Unity operator S_{t+1} = S_t + tanh(y_t - S_t) solves hierarchy + generations.
+
+## Triple Axiom Verification (2026-05-07)
+
+| Axiom | Test | Result | Status |
+|-------|------|--------|--------|
+| **1** | φ^(-130) Higgs | 246 GeV (0.00%) | [DOI](https://doi.org/10.5281/zenodo.20072372) |
+| **2** | ℤ₃ topology | [1, ω, ω²] | **VERIFIED** |
+| **8** | φ⁵ conservation | Variance 0.4944 | **STABLE** |
+
+Unity operator S_{t+1} = S_t + tanh(y_t - S_t) solves hierarchy + generations.
