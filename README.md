@@ -21,3 +21,7 @@ ESQET treats the universe as a self-correcting dynamical system using nonlinear 
 git clone https://github.com/esqet-architect/ESQET-Core.git
 cd ESQET-Core
 pip install -e ".[dev]"
+
+## Axiom 2: ℤ₃ Topology ✓
+Unity operator projects φ-signals onto L(3,1) lens space:
+ℤ₃ = [1.000, -0.500±0.866j] (exact 3rd roots of unity)
