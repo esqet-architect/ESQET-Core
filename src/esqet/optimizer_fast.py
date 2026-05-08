@@ -1,66 +1,121 @@
 #!/usr/bin/env python3
+"""
+ESQET Lepton Mass Model — Fast & Stable Version
+Uses numpy only, no mpmath type issues
+"""
+
 import numpy as np
 from scipy.optimize import differential_evolution, minimize
 
 # Constants
-PHI = (1.0 + np.sqrt(5.0)) / 2.0
-TARGETS = np.array([0.5109989461, 105.6583745, 1776.86])
+PHI = (1 + np.sqrt(5)) / 2
+OMEGA_REAL = np.cos(2 * np.pi / 3)  # Re(ω) = -1/2
+OMEGA_IMAG = np.sin(2 * np.pi / 3)   # Im(ω) = √3/2
 
-def get_masses(p, mu_scale, gamma, alpha):
-    n = np.array([0, 1, 2])
+# Known masses in MeV
+TARGETS = {
+    'e': 0.5109989461,
+    'mu': 105.6583745,
+    'tau': 1776.86
+}
+
+def z3_phase_modulation(n, alpha, strength=0.6):
+    """Z3 phase modulation based on cube roots of unity"""
+    # ω = e^(2πi/3)
+    phase_angle = 2 * np.pi * n / 3
+    # Real part modulation
+    modulation = 1.0 + strength * np.cos(phase_angle)
+    return modulation ** alpha
+
+def get_mass(n, p, mu_scale, gamma, alpha):
+    """
+    Centered mass formula (n=0: e, n=1: mu, n=2: tau)
+    
+    Parameters:
+    - p: exponent for PHI scaling
+    - mu_scale: muon mass anchor
+    - gamma: generation ratio factor
+    - alpha: phase stiffness
+    """
     gen_offset = n - 1
     
-    # Z3 modulation
-    phases = np.exp(2j * np.pi * n / 3.0)
-    modulation = 1.0 + 0.6 * np.real(phases)
-    delta = modulation ** alpha
+    # PHI scaling (centered on muon)
+    if gen_offset == 0:
+        phi_term = 1.0
+    else:
+        phi_term = PHI ** (gen_offset * p)
     
-    # Hierarchy: Muon centered
-    # mass = mu_scale * (PHI^(offset*p)) * (gamma^|offset|) * delta
-    # We use power for the hierarchy jumps
-    masses = mu_scale * (PHI ** (gen_offset * p)) * (gamma ** np.abs(gen_offset)) * delta
-    return masses
+    # Generation ratio term
+    ratio_term = gamma ** abs(gen_offset)
+    
+    # Z3 phase modulation
+    phase_term = z3_phase_modulation(n, alpha)
+    
+    mass = mu_scale * phi_term * ratio_term * phase_term
+    
+    # Floor for electron
+    if n == 0 and mass < 0.4:
+        mass = 0.4
+    
+    return mass
 
 def objective(params):
+    """Logarithmic error for scale invariance"""
     p, mu_scale, gamma, alpha = params
-    preds = get_masses(p, mu_scale, gamma, alpha)
     
-    # Logarithmic RMS error is much more robust for values across 4 orders of magnitude
-    log_errors = np.log(preds / TARGETS)
-    rmse = np.sqrt(np.mean(log_errors**2))
+    # Parameter bounds protection
+    if mu_scale < 10 or mu_scale > 500:
+        return 1e10
+    if gamma < 0.1 or gamma > 50:
+        return 1e10
     
-    # Add a small penalty for being too close to the bounds to push the optimizer back
-    return rmse
+    errors = []
+    for i, key in enumerate(['e', 'mu', 'tau']):
+        pred = get_mass(i, p, mu_scale, gamma, alpha)
+        target = TARGETS[key]
+        
+        # Combined absolute and relative error
+        abs_err = abs(pred - target) / target
+        log_err = abs(np.log(pred / target))
+        
+        errors.append(abs_err + 0.5 * log_err)
+    
+    return np.mean(errors)
+
+def koide_quality(masses):
+    """Check Koide relation Q = (sum m) / (sum sqrt(m))^2"""
+    sum_m = sum(masses)
+    sum_sqrt = sum(np.sqrt(max(0, m)) for m in masses)
+    if sum_sqrt == 0:
+        return 0
+    return sum_m / (sum_sqrt ** 2)
+
 
 if __name__ == "__main__":
-    print("============================================================")
-    print("      ESQET Lepton Mass Model — Fast Optimizer v4.4")
-    print("============================================================\n")
-
-    # Expanded bounds to stop "hugging" the 90.0 and 1.0 limits
+    print("="*60)
+    print("ESQET Lepton Mass Model — Fast Optimizer")
+    print("="*60)
+    
+    # Bounds for parameters
     bounds = [
-        (2.0, 12.0),      # p (Exponent)
-        (50.0, 150.0),    # mu_scale (Anchor - wider range)
-        (0.5, 20.0),      # gamma (Generation ratio)
-        (-2.0, 2.0)       # alpha (Phase stiffness)
+        (4.0, 12.0),    # p — PHI exponent
+        (90.0, 120.0),  # mu_scale — muon anchor (MeV)
+        (1.0, 30.0),    # gamma — generation ratio
+        (0.0, 3.0)      # alpha — phase stiffness
     ]
-
+    
+    print("\nRunning differential evolution...")
     result = differential_evolution(
         objective, bounds,
-        strategy='best1bin',
-        maxiter=1000,
+        tol=1e-10,
         popsize=30,
-        tol=1e-12,
-        mutation=(0.5, 1.0),
-        recombination=0.7,
-        disp=True
+        maxiter=200,
+        seed=42,
+        disp=True,
+        workers=1
     )
-
-    # Polishing
-    final_res = minimize(objective, result.x, method='L-BFGS-B', bounds=bounds)
-    p_opt, mu_opt, gamma_opt, alpha_opt = final_res.x
-
-    preds = get_masses(p_opt, mu_opt, gamma_opt, alpha_opt)
+    
+    p_opt, mu_opt, gamma_opt, alpha_opt = result.x
     
     print("\n" + "="*60)
     print("OPTIMIZATION RESULTS")
@@ -69,29 +124,55 @@ if __name__ == "__main__":
     print(f"Muon Anchor μ₀      : {mu_opt:.6f} MeV")
     print(f"Generation ratio γ  : {gamma_opt:.6f}")
     print(f"Phase stiffness α   : {alpha_opt:.6f}")
-    print(f"Final loss          : {final_res.fun:.8e}")
-
+    print(f"Final loss          : {result.fun:.8e}")
+    
     print("\n" + "="*60)
     print("PREDICTED MASSES")
     print("="*60)
-    names = ['E', 'MU', 'TAU']
-    for i in range(3):
-        err = abs(preds[i] - TARGETS[i]) / TARGETS[i] * 100
-        print(f"{names[i]:<3}     {preds[i]:12.4f}    {TARGETS[i]:12.4f}    {err:7.4f}%")
-
-    # Koide Relation
-    sum_m = np.sum(preds)
-    sum_sqrt_m = np.sum(np.sqrt(preds))
-    koide_q = sum_m / (sum_sqrt_m**2)
+    print(f"{'Particle':<10} {'Predicted':<12} {'Actual':<12} {'Error %':<10}")
+    print("-" * 50)
+    
+    predictions = []
+    for i, name in enumerate(['e', 'mu', 'tau']):
+        pred = get_mass(i, p_opt, mu_opt, gamma_opt, alpha_opt)
+        actual = TARGETS[name]
+        err_pct = abs(pred - actual) / actual * 100
+        predictions.append(pred)
+        print(f"{name.upper():<10} {pred:12.4f} {actual:12.4f} {err_pct:9.4f}%")
     
     print("\n" + "="*60)
     print("KOIDE RELATION VERIFICATION")
     print("="*60)
+    koide_q = koide_quality(predictions)
     print(f"Koide Q value       : {koide_q:.8f}")
-    print(f"Target (2/3)        : 0.66666667")
+    print(f"Target (2/3)        : {0.66666667:.8f}")
     print(f"Deviation           : {abs(koide_q - 2/3):.2e}")
-
+    print(f"Relative deviation  : {abs(koide_q - 2/3) / (2/3) * 100:.4f}%")
+    
+    # Golden ratio analysis
+    print("\n" + "="*60)
+    print("GOLDEN RATIO ANALYSIS")
+    print("="*60)
+    phi_p = PHI ** p_opt
+    print(f"φ^p                : {phi_p:.6f}")
+    print(f"Generation ratio γ : {gamma_opt:.6f}")
+    print(f"γ / φ^p            : {gamma_opt / phi_p:.6f}")
+    
+    # Z3 symmetry test
+    print("\n" + "="*60)
+    print("Z3 SYMMETRY TEST")
+    print("="*60)
+    for n in [0, 1, 2]:
+        mod = z3_phase_modulation(n, alpha_opt)
+        print(f"n={n} (mass {['e','μ','τ'][n]}): modulation = {mod:.6f}")
+    
+    # Recommended final parameters
     print("\n" + "="*60)
     print("RECOMMENDED ESQET PARAMETERS")
     print("="*60)
-    print(f"p={p_opt:.6f}, mu={mu_opt:.6f}, gamma={gamma_opt:.6f}, alpha={alpha_opt:.6f}")
+    print(f"""
+    p           = {p_opt:.6f}
+    mu_scale    = {mu_opt:.6f} MeV
+    gamma       = {gamma_opt:.6f}
+    alpha       = {alpha_opt:.6f}
+    """)
