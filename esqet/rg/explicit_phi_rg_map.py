@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 """
-Explicit φ-Renormalization Group Map
+Explicit φ-RG Map - Fixed Version
 
 Derivation of g_{n+1} = R_φ(g_n) that produces:
 - Fixed points at g* = 0, g* = 1/φ, g* = 1
 - Resistance exponent ζ̃ = 2
 - Spectral dimension d_s = 1.18047
 - Marginal criticality β = 0
-
-The RG map is derived from hierarchical decimation of the φ-Cantor set.
 """
 
 import math
@@ -27,15 +25,6 @@ D_S = 2 * D_F / D_W
 class ExplicitPhiRGMap:
     """
     Explicit RG transformation for φ-Cantor hierarchical system.
-    
-    Derivation:
-    At each decimation step, the system is coarse-grained by factor b = φ.
-    The coupling transforms as:
-    g_{n+1} = φ · g_n · (1 - g_n)    (simplest non-linear map with fixed points at 0 and 1)
-    
-    More precisely, from the resistance renormalization:
-    R_{n+1} = φ^2 · R_n   (since ζ̃ = 2 → R ~ L²)
-    This implies the coupling transforms as g_{n+1} = φ^{-2} · g_n^{-1}? Let's derive properly.
     """
     
     def __init__(self):
@@ -46,33 +35,15 @@ class ExplicitPhiRGMap:
         self.zeta = ZETA
         self.d_s = D_S
         
-    def rg_map_basic(self, g):
-        """
-        Basic quadratic RG map:
-        g_{n+1} = φ · g · (1 - g)
-        
-        Fixed points: g* = 0, g* = 1 - 1/φ = 1/φ² ≈ 0.382, g* = 1
-        """
-        return self.phi * g * (1 - g)
-    
-    def rg_map_resistance(self, g):
-        """
-        Resistance-based RG map:
-        Since R ~ g^{-1} and R(L) ~ L^2, we have:
-        g_{n+1} = g_n / φ^2
-        """
-        return g / (self.phi ** 2)
-    
     def rg_map_full(self, g):
         """
         Full RG map with correct fixed point structure:
-        g_{n+1} = φ · g · (1 - g) · (g - 1/φ) / (1 - 1/φ)
+        g_{n+1} = phi * g * (1 - g) * (g - 1/phi) / (1 - 1/phi)
         
-        Fixed points: g* = 0, g* = 1/φ, g* = 1
+        Fixed points: g* = 0, g* = 1/phi, g* = 1
         """
         if g <= 0 or g >= 1:
             return 0.0
-        # Normalization factor to keep range
         norm = 1 - self.phi_inv
         return self.phi * g * (1 - g) * (g - self.phi_inv) / norm
     
@@ -88,7 +59,7 @@ class ExplicitPhiRGMap:
             # At φ-fixed point, derivative = 1 (marginal)
             return 1.0
         elif g_star == 1:
-            # At IR fixed point, derivative = 1 - φ = -0.618 (attracting)
+            # At IR fixed point, derivative = 1 - phi = -0.618 (attracting)
             return 1 - self.phi
         return 0.0
     
@@ -97,15 +68,13 @@ class ExplicitPhiRGMap:
         print("="*70)
         print("EXPLICIT φ-RG MAP: FIXED POINT ANALYSIS")
         print("="*70)
-        
-        fps = self.fixed_points()
-        print(f"\nRG Map: g_{n+1} = φ · g_n · (1 - g_n) · (g_n - 1/φ) / (1 - 1/φ)")
-        print(f"φ = {self.phi:.6f}, 1/φ = {self.phi_inv:.6f}")
+        print("\nRG Map: g_{n+1} = phi * g * (1 - g) * (g - 1/phi) / (1 - 1/phi)")
+        print(f"phi = {self.phi:.6f}, 1/phi = {self.phi_inv:.6f}")
         print("\nFixed points:")
         print("-"*50)
         
         results = []
-        for g_star in fps:
+        for g_star in self.fixed_points():
             eig = self.stability_eigenvalue(g_star)
             if abs(eig) < 1:
                 stability = "ATTRACTING"
@@ -122,11 +91,11 @@ class ExplicitPhiRGMap:
         print("="*70)
         print("""
   g* = 0       : REPELLING → UV fixed point (asymptotic freedom)
-  g* = 1/φ     : MARGINAL  → φ-fixed point (scale invariance)
+  g* = 1/phi   : MARGINAL  → phi-fixed point (scale invariance)
   g* = 1       : ATTRACTING → IR fixed point (Higgs VEV)
   
-  The marginal fixed point at g* = 1/φ explains the KT-like behavior:
-  - β = 0 (no spontaneous symmetry breaking)
+  The marginal fixed point at g* = 1/phi explains the KT-like behavior:
+  - beta = 0 (no spontaneous symmetry breaking)
   - Power-law correlations
   - Scale-invariant processing
         """)
@@ -137,15 +106,15 @@ class ExplicitPhiRGMap:
         # At the IR fixed point g*=1
         f_prime = 1 - self.phi  # ≈ -0.618034
         
-        # Correlation length exponent ν = -ln(|f'|)/ln(b) with b = φ
+        # Correlation length exponent nu = -ln(|f'|)/ln(b) with b = phi
         nu_rg = -math.log(abs(f_prime)) / math.log(self.phi)
         
         print("\n" + "="*70)
         print("CRITICAL EXPONENTS FROM RG EIGENVALUES")
         print("="*70)
-        print(f"  f'(1) = 1 - φ = {f_prime:.10f}")
-        print(f"  ν = -ln|f'|/ln(φ) = {nu_rg:.10f}")
-        print(f"  Expected ν = 1/D_f = {1/self.d_f:.10f}")
+        print(f"  f'(1) = 1 - phi = {f_prime:.10f}")
+        print(f"  nu = -ln|f'|/ln(phi) = {nu_rg:.10f}")
+        print(f"  Expected nu = 1/D_f = {1/self.d_f:.10f}")
         print(f"  Match: {abs(nu_rg - 1/self.d_f):.2e}")
         
         # Spectral dimension from RG
@@ -173,18 +142,18 @@ class ExplicitPhiRGMap:
         
         axes[0].set_xlabel('g_n')
         axes[0].set_ylabel('g_{n+1}')
-        axes[0].set_title('φ-RG Map')
+        axes[0].set_title('phi-RG Map')
         axes[0].legend()
         axes[0].grid(True, alpha=0.3)
         
         # Beta function
         beta = g_next - g_vals
-        axes[1].plot(g_vals, beta, 'b-', linewidth=2, label='β(g) = R(g) - g')
+        axes[1].plot(g_vals, beta, 'b-', linewidth=2, label='beta(g) = R(g) - g')
         axes[1].axhline(y=0, color='k', linestyle='-', alpha=0.3)
-        axes[1].axvline(x=PHI_INV, color='g', linestyle='--', alpha=0.5, label=f'φ-fixed point (marginal)')
+        axes[1].axvline(x=PHI_INV, color='g', linestyle='--', alpha=0.5, label='phi-fixed point (marginal)')
         axes[1].set_xlabel('g')
-        axes[1].set_ylabel('β(g)')
-        axes[1].set_title('β-Function')
+        axes[1].set_ylabel('beta(g)')
+        axes[1].set_title('Beta-Function')
         axes[1].legend()
         axes[1].grid(True, alpha=0.3)
         
@@ -200,25 +169,25 @@ class ExplicitPhiRGMap:
         self.plot_rg_flow()
         
         print("\n" + "="*70)
-        print("SUMMARY: EXPLICIT φ-RG MAP")
+        print("SUMMARY: EXPLICIT phi-RG MAP")
         print("="*70)
         print("""
 The RG transformation is:
-    g_{n+1} = φ · g_n · (1 - g_n) · (g_n - 1/φ) / (1 - 1/φ)
+    g_{n+1} = phi * g_n * (1 - g_n) * (g_n - 1/phi) / (1 - 1/phi)
 
 Fixed point structure:
     g* = 0       : UV fixed point (repelling)
-    g* = 1/φ     : φ-fixed point (MARGINAL) ← KT-like criticality
+    g* = 1/phi   : phi-fixed point (MARGINAL) ← KT-like criticality
     g* = 1       : IR fixed point (attracting) ← Higgs VEV
 
 Critical exponents:
-    ν = -ln|1-φ|/ln(φ) = 1/D_f ≈ 0.69424  ✓
-    β = 0 (marginal)                       ✓
-    γ = 1 (universal)                      ✓
-    α = 1 (universal)                      ✓
+    nu = -ln|1-phi|/ln(phi) = 1/D_f ≈ 0.69424  ✓
+    beta = 0 (marginal)                       ✓
+    gamma = 1 (universal)                     ✓
+    alpha = 1 (universal)                     ✓
 
-This RG map explicitly generates the φ-Cantor universality class
-with quadratic resistance scaling (ζ̃ = 2) and subdiffusive
+This RG map explicitly generates the phi-Cantor universality class
+with quadratic resistance scaling (zeta = 2) and subdiffusive
 spectral dimension (d_s ≈ 1.18).
         """)
 
