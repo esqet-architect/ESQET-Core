@@ -1,0 +1,3 @@
+
+[project.scripts]
+esqet-gr = "esqet.apps.cli.gr_cli:main"

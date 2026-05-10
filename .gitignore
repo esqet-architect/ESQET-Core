@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Simulation outputs
+simulations/logs/
+results/*.log
+
+# Environments
+phi_env/
+aether_env/
+ibm_quantum_env/
+
+# OS junk
+.DS_Store
+Thumbs.db
