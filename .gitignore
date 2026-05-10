@@ -1,17 +1,40 @@
-# Python
+# Virtual environments - NEVER COMMIT THESE
+venv/
+.venv/
+env/
+ENV/
+venv*/
+*venv/
+
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
 
-# Simulation outputs
-simulations/logs/
-results/*.log
+# Git temp files
+*.tmp_obj*
+*.l2s.tmp*
 
-# Environments
-phi_env/
-aether_env/
-ibm_quantum_env/
+# IDE
+.vscode/
+.idea/
+*.swp
 
-# OS junk
+# OS
 .DS_Store
 Thumbs.db
+
+# Logs and data
+*.log
+*.log.*
+*.npz
+*.png
+*.jpg
+*.zip
+
+# Sensitive
+.env
+.env.*
+*.key
+*.pem
