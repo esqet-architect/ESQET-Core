@@ -1,0 +1,11 @@
+{
+  "axiom": 3,
+  "name": "\u2124\u2083 Torsion \u2192 3 Generations",
+  "topology": "\u03c0\u2081(L(3,1)) = \u2124\u2083",
+  "anomaly_condition": "\u2211 q_i\u00b3 \u2261 0 (mod 3)",
+  "observed_generations": 3,
+  "predicted_generations": 3,
+  "mass_hierarchy_phi_scaling": false,
+  "minimal_solution": "k=1 \u2192 N=3",
+  "status": false
+}
