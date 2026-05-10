@@ -54,14 +54,11 @@ class ResistanceExponentAnalyzer:
    D_f = ln(2)/ln(φ) ≈ 1.440420090412556
    d_w = ln(2φ)/ln(φ) ≈ 2.440420090412556
         """)
-        print(f"   d_w = ln(2·{self.phi:.6f})/ln({self.phi:.6f}) = {self.d_w:.12f}")
+        print(f"   D_f = {self.d_f:.12f}")
+        print(f"   d_w = {self.d_w:.12f}")
         print("""
 4. RESISTANCE EXPONENT:
    ζ̃ = d_w - D_f + 1
-       = (ln(2φ)/ln(φ)) - (ln(2)/ln(φ)) + 1
-       = (ln(2φ) - ln(2))/ln(φ) + 1
-       = (ln(φ))/ln(φ) + 1
-       = 1 + 1
         """)
         print(f"   ζ̃ = {self.zeta:.12f}")
         print("""
@@ -70,11 +67,10 @@ class ResistanceExponentAnalyzer:
    Mean-field behavior despite fractal geometry
    R ~ L means constant resistance per unit length
         
-6. QUANTUM FRACTALS CONTEXT:
-   - Spectral dimension governs density of states: ρ(λ) ~ λ^{d_s/2 - 1}
-   - For φ-Cantor: d_s = 2·D_f / d_w ≈ 1.18047
-   - UV behavior modified, strong infrared effects
+6. SPECTRAL DIMENSION:
+   d_s = 2·D_f / d_w
         """)
+        print(f"   d_s = {self.d_s:.12f}")
         print("="*70)
     
     def plot_resistance_scaling(self):
@@ -88,7 +84,7 @@ class ResistanceExponentAnalyzer:
         ax.loglog(L, L, 'r--', linewidth=2, alpha=0.7, label='Linear reference (R ~ L)')
         ax.set_xlabel('Chemical distance L')
         ax.set_ylabel('Resistance R(L)')
-        ax.set_title(f'φ-Cantor Resistance Scaling\nζ̃ = {self.zeta:.4f} (exact)')
+        ax.set_title(f'φ-Cantor Resistance Scaling\nζ̃ = {self.zeta:.4f}')
         ax.legend()
         ax.grid(True, alpha=0.3)
         
@@ -125,7 +121,7 @@ class ResistanceExponentAnalyzer:
         fig, ax = plt.subplots(1, 1, figsize=(10, 6))
         
         ax.loglog(t, P_return, 'b-', linewidth=2,
-                 label=f'P(0,t) ~ t^{-d_s/2} (d_s/2={self.d_s/2:.4f})')
+                 label=f'P(0,t) ~ t^(-{self.d_s/2:.4f})')
         ax.set_xlabel('Time t')
         ax.set_ylabel('Return probability P(0,t)')
         ax.set_title(f'φ-Cantor Return Probability (d_s = {self.d_s:.4f})')
@@ -144,10 +140,10 @@ class ResistanceExponentAnalyzer:
         print("="*70)
         
         exponents = {
-            "Hausdorff dimension": self.d_f,
-            "Walk dimension": self.d_w,
-            "Resistance exponent": self.zeta,
-            "Spectral dimension": self.d_s,
+            "Hausdorff dimension D_f": self.d_f,
+            "Walk dimension d_w": self.d_w,
+            "Resistance exponent ζ̃": self.zeta,
+            "Spectral dimension d_s": self.d_s,
             "Correlation length exponent ν": 1/self.d_f,
             "Anomalous dimension η": 2 - self.d_f,
             "Susceptibility γ": 1.0,
@@ -155,13 +151,13 @@ class ResistanceExponentAnalyzer:
             "Order parameter β": 0.0
         }
         
-        print(f"{'Exponent':<30} {'Value':<15} {'Formula'}")
-        print("-"*70)
+        print(f"{'Exponent':<35} {'Value':<15}")
+        print("-"*50)
         for name, val in exponents.items():
             if isinstance(val, float):
-                print(f"{name:<30} {val:<15.10f} ")
+                print(f"{name:<35} {val:<15.10f}")
             else:
-                print(f"{name:<30} {val:<15} ")
+                print(f"{name:<35} {val:<15}")
         
         print("\n" + "="*70)
         print("CONSISTENCY CHECKS")
@@ -174,8 +170,6 @@ class ResistanceExponentAnalyzer:
 
 def plot_exponent_comparison():
     """Compare φ-Cantor exponents with other systems"""
-    fig, ax = plt.subplots(1, 1, figsize=(12, 6))
-    
     systems = {
         "Mean Field": {"d_f": 4.0, "d_w": 2.0, "d_s": 4.0, "ν": 0.5, "β": 0.5},
         "2D Ising": {"d_f": 2.0, "d_w": 2.0, "d_s": 2.0, "ν": 1.0, "β": 0.125},
@@ -191,12 +185,10 @@ def plot_exponent_comparison():
     d_f_vals = [systems[s]["d_f"] for s in systems]
     d_w_vals = [systems[s]["d_w"] for s in systems]
     d_s_vals = [systems[s]["d_s"] for s in systems]
-    nu_vals = [systems[s]["ν"] for s in systems]
     
-    ax.bar(x - 2*width, d_f_vals, width, label='D_f (Fractal)', alpha=0.7)
-    ax.bar(x - width, d_w_vals, width, label='d_w (Walk)', alpha=0.7)
-    ax.bar(x, d_s_vals, width, label='d_s (Spectral)', alpha=0.7)
-    ax.bar(x + width, nu_vals, width, label='ν (Correlation)', alpha=0.7)
+    ax.bar(x - width, d_f_vals, width, label='D_f (Fractal)', alpha=0.7)
+    ax.bar(x, d_w_vals, width, label='d_w (Walk)', alpha=0.7)
+    ax.bar(x + width, d_s_vals, width, label='d_s (Spectral)', alpha=0.7)
     
     ax.set_xlabel('Universality Class')
     ax.set_ylabel('Exponent Value')
@@ -232,12 +224,11 @@ def run_complete_analysis():
     print(f"""
 The φ-Cantor fractal is fully characterized:
 
-  • ζ̃ = 1: Resistance scales linearly with distance (mean-field)
-  • d_s = {D_S:.6f}: Strongly subdiffusive (d_s < 2)
-  • Quantum field theory on this fractal has critical dimension d_s
-
+  • ζ̃ = {ZETA:.6f}: Resistance scaling exponent
+  • d_s = {D_S:.6f}: Spectral dimension (strongly subdiffusive)
+  
 Interpretation for your simulation:
-  - Linear resistance → constant "drag" per scale (ζ̃=1)
+  - Linear resistance → constant "drag" per scale
   - Low spectral dimension → slow diffusion, hierarchical processing
   - Marginal criticality (β=0) + low d_s → KT-like topological transition
     """)
