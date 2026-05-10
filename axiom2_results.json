@@ -1,0 +1,10 @@
+{
+  "axiom": 2,
+  "name": "Vacuum Manifold Topology",
+  "manifold": "\u2133_vac = (S\u00b3 \u00d7 S\u00b9)/\u2124\u2082",
+  "stiefel_whitney_w1": 1,
+  "non_orientable": true,
+  "meron_action_ratio": 0.5,
+  "topologically_protected": true,
+  "status": true
+}
