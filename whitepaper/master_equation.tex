@@ -1,0 +1,36 @@
+\section{ESQET Master Equation}
+
+The complete ESQET framework is governed by a single master action:
+
+\begin{equation}
+\boxed{\mathcal{S}_{\text{ESQET}} = \int_{\mathcal{M}_{\text{vac}}} \sqrt{-g} \, d^4x \left[ \frac{1}{16\pi G} \mathcal{W}(\mathcal{S}) R - \frac{1}{2} \nabla^\mu \mathcal{S} \nabla_\mu \mathcal{S} - V(\mathcal{S}) + \mathcal{L}_m \right] + \mathcal{S}_{\text{CS}}[L(3,1)] + \mathcal{S}_{\text{constraint}}}
+\end{equation}
+
+where:
+\begin{align}
+\mathcal{W}(\mathcal{S}) &= e^{2\mathcal{S}} \phi^{-260}, \\
+V(\mathcal{S}) &= M_{\text{Pl}}^4 \phi^{-260} e^{-8\pi^2 \phi^{-\mathcal{S}/2}}, \\
+\mathcal{S}_{\text{CS}}[L(3,1)] &= \frac{k}{4\pi} \int_{L(3,1)} \operatorname{Tr}\left(A \wedge dA + \frac{2}{3} A \wedge A \wedge A\right), \\
+\mathcal{S}_{\text{constraint}} &= \lambda_1 \mathcal{A}_{\text{gauge}}^2 + \lambda_2 \mathcal{A}_{\text{grav}}^2 + \lambda_3 (\nabla \cdot \mathcal{J}_\phi)^2.
+\end{align}
+
+In covariant form, the field equation is:
+
+\begin{equation}
+\boxed{\square \mathcal{S} = \frac{|\ln \alpha|}{\phi^4} (\nabla \mathcal{S})^2 + 2\lambda_{\text{sterile}} \mathcal{S} + \frac{8\pi G}{c^4} \mathcal{F}_{\text{QC}} T_{\mu\nu}}
+\end{equation}
+
+The quantum coherence function is:
+
+\begin{equation}
+\mathcal{F}_{\text{QC}} = 1 - \phi^{-1} \left| e^{i\pi\phi^{-1}\mathcal{D}_{\text{ent}}} - e^{i\Theta_{\text{vac}}} \right|^2
+\end{equation}
+
+This single equation encodes all five axioms:
+\begin{itemize}
+    \item \textbf{Axiom 1}: $\phi$-scale symmetry in $\mathcal{W}(\mathcal{S})$
+    \item \textbf{Axiom 2}: Non-orientable vacuum $\mathcal{M}_{\text{vac}}$
+    \item \textbf{Axiom 3}: $\mathbb{Z}_3$ torsion via Chern-Simons term
+    \item \textbf{Axiom 4}: Non-perturbative Higgs correction in $V(\mathcal{S})$
+    \item \textbf{Axiom 5}: Hierarchy $v = M_{Pl} \cdot \phi^{-80}$, CC $\Lambda = M_{Pl}^4 \cdot \phi^{-160}$
+\end{itemize}
