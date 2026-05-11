@@ -1,0 +1,9 @@
+{
+  "axiom": 4,
+  "name": "Non-Perturbative Higgs Correction",
+  "loop_factor": 0.012665147955292222,
+  "kappa_lambda_deviation": 5.150977108040998e-36,
+  "kappa_lambda": 1.0,
+  "sign": "positive",
+  "status": "consistent_with_axiom_2"
+}

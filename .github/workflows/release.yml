@@ -1,0 +1,36 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: ESQET ${{ github.ref_name }}
+        body: |
+          ## ESQET Framework Release ${{ github.ref_name }}
+          
+          ### Zenodo DOIs
+          - Axiom 1: 10.5281/zenodo.20072372
+          - Axiom 2: 10.5281/zenodo.20114684
+          - Axiom 3: 10.5281/zenodo.20114686
+          - Axiom 4: 10.5281/zenodo.20114688
+          - Axiom 5: 10.5281/zenodo.20114690
+          
+          ### What's New
+          - Complete five-axiom framework
+          - Spectral dimension analysis
+          - Quantum walk implementation
+          - Golden mean networking
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

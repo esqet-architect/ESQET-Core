@@ -1,0 +1,41 @@
+name: Validate ESQET Framework
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install numpy scipy matplotlib networkx
+    
+    - name: Run Axiom 2 verification
+      run: python zenodo/axiom2/verify_axiom2.py
+    
+    - name: Run Axiom 3 verification
+      run: python esqet/axioms/anomaly_analyzer.py
+    
+    - name: Run spectral dimension test
+      run: python esqet/fractals/spectral_dimension_advanced.py
+    
+    - name: Upload validation results
+      uses: actions/upload-artifact@v4
+      with:
+        name: validation-results
+        path: |
+          axiom*.json
+          *.png

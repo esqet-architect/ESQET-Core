@@ -1,0 +1,18 @@
+{
+  "title": "ESQET Axiom 3: ℤ₃ Torsion Forces Three Fermion Generations",
+  "description": "The vacuum manifold ℳ_vac contains a canonically embedded lens space L(3,1) = S³/ℤ₃ as a persistent 3-cycle. π₁(L(3,1)) = ℤ₃ classifies chiral zero modes. Anomaly cancellation (gauge + gravitational + discrete) forces exactly three generations of Standard Model fermions. N_generations = 3 is the unique integer solution to the ℤ₃³ discrete anomaly cancellation condition.",
+  "creators": [
+    {
+      "name": "Rocha Jr., Marco Antônio",
+      "orcid": "0009-0004-9757-2853",
+      "affiliation": "Phi-LUCA AGI Platform"
+    }
+  ],
+  "keywords": ["ESQET", "ℤ₃ torsion", "lens space", "anomaly cancellation", "three generations", "golden ratio"],
+  "license": "CC-BY-4.0",
+  "access_right": "open",
+  "communities": [{"identifier": "physics"}],
+  "related_identifiers": [
+    {"identifier": "10.5281/zenodo.20072372", "relation": "continues"}
+  ]
+}

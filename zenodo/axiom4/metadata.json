@@ -1,0 +1,18 @@
+{
+  "title": "ESQET Axiom 4: Non-Perturbative Higgs Correction from Non-Orientable Vacuum",
+  "description": "The non-orientable vacuum (Axiom 2) induces a universal 1/(8π²) loop factor in all instanton processes. The leading non-perturbative correction to the Higgs potential is the dimension-6 operator Δℒ = + c₆ (H†H)³/M_Pl² with positive coefficient c₆ = O(1) derived from the topological θ-term on ℳ_vac. The Higgs trilinear self-coupling deviates positively from the Standard Model: κ_λ - 1 = + C·(v/M_Pl)²·1/(8π²) with C > 0.",
+  "creators": [
+    {
+      "name": "Rocha Jr., Marco Antônio",
+      "orcid": "0009-0004-9757-2853",
+      "affiliation": "Phi-LUCA AGI Platform"
+    }
+  ],
+  "keywords": ["ESQET", "Higgs", "non-perturbative", "dimension-6 operator", "golden ratio"],
+  "license": "CC-BY-4.0",
+  "access_right": "open",
+  "communities": [{"identifier": "physics"}],
+  "related_identifiers": [
+    {"identifier": "10.5281/zenodo.20072372", "relation": "continues"}
+  ]
+}

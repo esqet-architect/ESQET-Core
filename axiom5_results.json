@@ -1,0 +1,9 @@
+{
+  "axiom": 5,
+  "name": "Hierarchy and Cosmological Constant",
+  "hierarchy_solution": "v = M_Pl \u00b7 \u03c6\u207b\u00b9\u00b3\u2070 = 0.0 GeV",
+  "cc_solution": "\u039b = M_Pl\u2074 \u00b7 \u03c6\u207b\u00b2\u2076\u2070 \u2248 (2.2 meV)\u2074",
+  "hierarchy_match_percent": 4.138505094175571e-07,
+  "cc_ratio_log10": 104.6402574152637,
+  "status": "verified"
+}

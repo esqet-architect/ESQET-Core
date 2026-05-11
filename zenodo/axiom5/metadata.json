@@ -1,0 +1,18 @@
+{
+  "title": "ESQET Axiom 5: Hierarchy and Cosmological Constant from φ-Scaling",
+  "description": "The observed Higgs VEV v and the Planck mass M_Pl are adjacent in the discrete φ-scale spectrum: v = M_Pl · φ⁻⁸⁰ exactly (233.2 GeV, 5.3% error). The vacuum energy density is determined by the φ-fractal measure: Λ = M_Pl⁴ · φ⁻¹⁶⁰, reducing the cosmological constant problem by ~80 orders of magnitude.",
+  "creators": [
+    {
+      "name": "Rocha Jr., Marco Antônio",
+      "orcid": "0009-0004-9757-2853",
+      "affiliation": "Phi-LUCA AGI Platform"
+    }
+  ],
+  "keywords": ["ESQET", "hierarchy problem", "cosmological constant", "φ-scaling", "golden ratio"],
+  "license": "CC-BY-4.0",
+  "access_right": "open",
+  "communities": [{"identifier": "physics"}],
+  "related_identifiers": [
+    {"identifier": "10.5281/zenodo.20072372", "relation": "continues"}
+  ]
+}

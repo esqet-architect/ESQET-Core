@@ -1,0 +1,21 @@
+#!/bin/bash
+# arXiv submission helper for Axiom 2
+
+echo "=========================================="
+echo "ESQET AXIOM 2 - arXiv Submission Helper"
+echo "=========================================="
+echo ""
+echo "Files to submit:"
+echo "  - axiom2_paper.tex (main LaTeX)"
+echo "  - verify_axiom2.py (verification code)"
+echo "  - README.md (optional)"
+echo ""
+echo "Steps:"
+echo "  1. Compile LaTeX: pdflatex axiom2_paper.tex"
+echo "  2. Check for errors"
+echo "  3. Create tarball: tar -czf axiom2_submission.tar.gz *"
+echo "  4. Upload to arXiv.org"
+echo ""
+echo "arXiv category: hep-th (High Energy Physics - Theory)"
+echo "               or gr-qc (General Relativity and Quantum Cosmology)"
+echo "=========================================="

@@ -1,0 +1,18 @@
+{
+  "title": "ESQET Axiom 2: The Non-Orientable Vacuum Manifold (S³ × S¹)/ℤ₂",
+  "description": "The vacuum manifold is the non-orientable quotient (S³ × S¹)/ℤ₂ with ℤ₂ action (g,θ) ∼ (-g, θ+π). This topology forces meron action = 4π²/g² (half the instanton) and universal loop factor = 1/(8π²). Both are topologically protected by non-trivial first Stiefel-Whitney class w₁ ≠ 0.",
+  "creators": [
+    {
+      "name": "Rocha Jr., Marco Antônio",
+      "orcid": "0009-0004-9757-2853",
+      "affiliation": "Phi-LUCA AGI Platform"
+    }
+  ],
+  "keywords": ["ESQET", "vacuum manifold", "non-orientable", "Stiefel-Whitney", "meron", "instanton", "golden ratio"],
+  "license": "CC-BY-4.0",
+  "access_right": "open",
+  "communities": [{"identifier": "physics"}],
+  "related_identifiers": [
+    {"identifier": "10.5281/zenodo.20072372", "relation": "continues"}
+  ]
+}
