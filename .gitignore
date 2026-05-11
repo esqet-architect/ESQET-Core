@@ -41,3 +41,5 @@ Thumbs.db
 venv/
 .venv/
 axiom*_results.json
+*.json.bak
+investigator_log.txt
