@@ -40,3 +40,4 @@ Thumbs.db
 *.pem
 venv/
 .venv/
+axiom*_results.json
