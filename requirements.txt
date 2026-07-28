@@ -1,0 +1,13 @@
+# ESQET-Core Dependencies
+# Core numerical computing
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Visualization (for trace_map_analysis.png)
+matplotlib>=3.7.0
+
+# Optional but recommended
+# seaborn>=0.12.0  # For enhanced plots
+
+# Testing (if you add tests later)
+# pytest>=7.0.0
